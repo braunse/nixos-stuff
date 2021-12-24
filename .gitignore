@@ -1,0 +1,11 @@
+# Copyright (C) 2021  Sebastien Braun <sebastien@sebbraun.de>
+#
+# SPDX-License-Identifier: CC0-1.0
+
+.DS_Store
+.idea
+*.log
+tmp/
+result
+result-*
+.direnv/
