@@ -14,6 +14,7 @@ in
   options.braunse.dev = with types; {
     enable = mkEnableOption "Development Environments";
     enableElixir = mkEnableOption "Elixir";
+    enableFonts = mkEnableOption "Nerd Fonts";
     enableJupyter = mkEnableOption "Jupyter";
     enableRust = mkEnableOption "Rust";
     enableR = mkEnableOption "R";
@@ -21,6 +22,19 @@ in
     rPackages = mkOption {
       type = listOf package;
       default = [ ];
+    };
+    nerdFonts = mkOption {
+      type = listOf str;
+      default = [
+        "CascadiaCode"
+        "FiraCode"
+        "Hasklig"
+        "Inconsolata"
+        "Iosevka"
+        "JetBrainsMono"
+        "SourceCodePro"
+        "Terminus"
+      ];
     };
   };
 
@@ -66,6 +80,14 @@ in
         pkgs.nodejs
         pkgs.deno
         pkgs.nodePackages.typescript-language-server
+      ];
+    })
+
+    (mkIf cfg.enableFonts {
+      fonts.fonts = [
+        (pkgs.nerdfonts.override {
+          fonts = cfg.nerdFonts;
+        })
       ];
     })
   ]);

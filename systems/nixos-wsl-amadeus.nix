@@ -18,6 +18,7 @@ nixpkgs.lib.nixosSystem {
       braunse.dev = {
         enable = true;
         enableElixir = true;
+        enableFonts = true;
         enableRust = true;
         enableR = true;
         enableTypescript = true;
@@ -31,15 +32,26 @@ nixpkgs.lib.nixosSystem {
 
       braunse.xpra.enable = true;
 
-      users.users.seb.xpraDisplay = ":101";
+      users.users.seb = {
+        xpraDisplay = ":101";
+        openssh.authorizedKeys.keys = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPdIT0XF1FMQTSBfm5kkyNT7qPxzMtAsbCTCFmyHBWaS" ];
+      };
 
       networking.hostName = "nixos-wsl-amadeus";
+
+      services.openssh = {
+        enable = true;
+        listenAddresses = [{ addr = "127.0.0.1"; port = 17022; }];
+      };
 
       nix.package = pkgs.nixFlakes;
       nix.extraOptions = ''
         experimental-features = nix-command flakes
         keep-derivations = true
       '';
+      nix.nixPath = [
+        "nixpkgs=${nixpkgs}"
+      ];
 
       nix.registry.nixpkgs.flake = nixpkgs;
 

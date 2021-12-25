@@ -51,12 +51,12 @@ in
           ConditionFileNotEmpty = "/etc/xpra-assigned-displays/%u";
         };
         serviceConfig = {
-          Type = "forking";
+          Type = "simple";
           PIDFile = "/run/xpra-%U.pid";
         };
         path = [ pkgs.xpra ];
         script = ''
-          xpra start $(cat /etc/xpra-assigned-displays/%u) --systemd-run=no --daemon=no --pidfile=/run/xpra-%U.pid
+          exec xpra start $(cat /etc/xpra-assigned-displays/$USER) --systemd-run=no --daemon=no --pidfile=/run/xpra-$UID.pid
         '';
       };
 
