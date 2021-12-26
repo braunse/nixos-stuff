@@ -7,6 +7,10 @@
 
   inputs = {
     flake-utils.url = "github:numtide/flake-utils";
+    home-manager = {
+      url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     import-cargo = {
       url = "github:edolstra/import-cargo";
     };

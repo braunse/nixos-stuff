@@ -2,12 +2,13 @@
 #
 # SPDX-License-Identifier: MPL-2.0
 
-{ self, nixpkgs, ... }:
+{ self, nixpkgs, home-manager, ... }:
 
 nixpkgs.lib.nixosSystem {
   system = "x86_64-linux";
   modules = [
     self.nixosModule
+    home-manager.nixosModules.home-manager
 
     ({ config, lib, pkgs, ... }: {
       braunse.wsl = {
@@ -41,7 +42,7 @@ nixpkgs.lib.nixosSystem {
 
       services.openssh = {
         enable = true;
-        listenAddresses = [{ addr = "127.0.0.1"; port = 17022; }];
+        listenAddresses = [{ addr = "127.0.0.1"; port = 17022; } { addr = "0.0.0.0"; port = 22; }];
       };
 
       nix.package = pkgs.nixFlakes;
@@ -59,6 +60,38 @@ nixpkgs.lib.nixosSystem {
         enable = true;
         man.enable = true;
         nixos.enable = true;
+      };
+
+      home-manager = {
+        useGlobalPkgs = true;
+        useUserPackages = true;
+        users.seb = { config, lib, pkgs, ... }: {
+          programs.bash = {
+            enable = true;
+            enableVteIntegration = true;
+            historyControl = [ "erasedups" "ignoredups" "ignorespace" ];
+          };
+
+          programs.bat.enable = true;
+
+          programs.direnv = {
+            enable = true;
+          };
+
+          programs.git = {
+            enable = true;
+            userName = "Sebastien Braun";
+            userEmail = "sebastien@sebbraun.de";
+          };
+
+          programs.lsd.enable = true;
+
+          programs.keychain = {
+            enable = true;
+            agents = [ "ssh" ];
+            keys = [ "id_ed25519_2" ];
+          };
+        };
       };
     })
   ];
