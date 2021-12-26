@@ -20,14 +20,21 @@ in
     enable = mkEnableOption "Development Environments";
     enableElixir = mkEnableOption "Elixir";
     enableFonts = mkEnableOption "Nerd Fonts";
+    enableHaskell = mkEnableOption "Haskell";
     enableJupyter = mkEnableOption "Jupyter";
     enableNode = mkEnableOption "Node.js";
+    enablePurescript = mkEnableOption "Purescript";
     enableRust = mkEnableOption "Rust";
     enableR = mkEnableOption "R";
+    enableScala = mkEnableOption "Scala";
     enableTypescript = mkEnableOption "Typescript";
     rPackages = mkOption {
       type = listOf package;
       default = [ ];
+    };
+    ghcVersions = mkOption {
+      type = listOf str;
+      default = [ "8107" ];
     };
     nerdFonts = mkOption {
       type = listOf str;
@@ -81,6 +88,16 @@ in
       ];
     })
 
+    (mkIf cfg.enableHaskell {
+      environment.systemPackages =
+        map (v: pkgs.haskell.compiler."ghc${v}") cfg.ghcVersions ++
+        [
+          (pkgs.haskell-language-server.override { supportedGhcVersions = cfg.ghcVersions; })
+          pkgs.cabal-install
+          pkgs.cabal2nix
+        ];
+    })
+
     (mkIf cfg.enableRust {
       environment.systemPackages = [
         self.packages.${system}.rust-toolchain
@@ -96,6 +113,26 @@ in
     })
 
     (mkIf cfg.enableJupyter { })
+
+    (mkIf cfg.enablePurescript {
+      environment.systemPackages = [
+        pkgs.purescript
+        pkgs.purescript-psa
+        pkgs.psc-package
+        pkgs.pscid
+        pkgs.pulp
+      ];
+    })
+
+    (mkIf cfg.enableScala {
+      environment.systemPackages = [
+        pkgs.dotty
+        pkgs.scala
+        pkgs.metals
+        pkgs.mill
+        pkgs.sbt
+      ];
+    })
 
     (mkIf cfg.enableTypescript {
       environment.systemPackages = [

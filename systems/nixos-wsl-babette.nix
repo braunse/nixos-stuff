@@ -20,8 +20,11 @@ nixpkgs.lib.nixosSystem {
         enable = true;
         enableElixir = true;
         enableFonts = true;
+        enableHaskell = true;
+        enablePurescript = true;
         enableRust = true;
         enableR = true;
+        enableScala = true;
         enableTypescript = true;
 
         rPackages = with pkgs.rPackages; [
