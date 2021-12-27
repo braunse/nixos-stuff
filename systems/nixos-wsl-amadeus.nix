@@ -84,6 +84,8 @@ nixpkgs.lib.nixosSystem {
             userEmail = "sebastien@sebbraun.de";
           };
 
+          programs.htop.enable = true;
+
           programs.lsd.enable = true;
 
           programs.keychain = {
