@@ -5,10 +5,15 @@
 { self, rust-overlay, ... }:
 { config, lib, pkgs, ... }:
 
+with builtins;
 with lib;
 
-let cfg = config.braunse.dev;
+let
+  cfg = config.braunse.dev;
   inherit (pkgs) system;
+  emacs = pkgs.emacs.pkgs.withPackages (p:
+    map (n: getAttr n p) cfg.emacsPackages
+  );
 in
 {
   options.braunse.dev = with types; {
@@ -34,6 +39,12 @@ in
         "JetBrainsMono"
         "SourceCodePro"
         "Terminus"
+      ];
+    };
+    emacsPackages = mkOption {
+      type = listOf str;
+      default = [
+        "vterm"
       ];
     };
   };
@@ -62,7 +73,7 @@ in
     (mkIf cfg.enableRust {
       environment.systemPackages = [
         self.packages.${system}.rust-toolchain
-        (self.packages.${system}.rust-analyzer-git.override { rustc = self.packages.${system}.rust-toolchain; cargo = self.packages.${system}.rust-toolchain; })
+        self.packages.${system}.rust-analyzer
       ];
     })
 

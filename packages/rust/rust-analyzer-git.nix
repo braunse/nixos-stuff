@@ -3,21 +3,20 @@
 # SPDX-License-Identifier: MPL-2.0
 
 { pkgs
+, lib
 , stdenv
-, rustc
-, cargo
+, rust-toolchain
 , importCargo
 , rust-analyzer-src
 }:
+with lib;
 stdenv.mkDerivation {
   pname = "rust-analyzer-git";
   version = rust-analyzer-src.rev;
   src = rust-analyzer-src;
   nativeBuildInputs = [
     (importCargo { lockFile = "${rust-analyzer-src}/Cargo.lock"; inherit pkgs; }).cargoHome
-    rustc
-    cargo
-  ];
+  ] ++ (toList rust-toolchain);
 
   buildPhase = ''
     cd crates/rust-analyzer

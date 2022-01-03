@@ -10,5 +10,6 @@
     self.nixosModules.wsl
     self.nixosModules.dev-envs
     self.nixosModules.xpra
+    self.nixosModules.my-utils
   ];
 }
