@@ -21,6 +21,7 @@ in
     enableElixir = mkEnableOption "Elixir";
     enableFonts = mkEnableOption "Nerd Fonts";
     enableJupyter = mkEnableOption "Jupyter";
+    enableNode = mkEnableOption "Node.js";
     enableRust = mkEnableOption "Rust";
     enableR = mkEnableOption "R";
     enableTypescript = mkEnableOption "Typescript";
@@ -67,6 +68,16 @@ in
         erlang-ls
         elixir_1_12
         elixir_ls
+        pkgs.crate2nix
+      ];
+    })
+
+    (mkIf cfg.enableNode {
+      environment.systemPackages = with pkgs; with pkgs.nodePackages; [
+        nodejs
+        yarn
+        pnpm
+        node2nix
       ];
     })
 

@@ -13,14 +13,26 @@ in
     braunse.utils = {
       enable = mkOption {
         type = bool;
-        default = true;
+        default = false;
         description = "Whether to include my default set of utility programs";
+      };
+
+      unfree.allow = mkOption {
+        type = listOf str;
+        default = [];
+        description = "What unfree packages to allow";
+      };
+
+      useMicrosoftFonts = mkOption {
+        type = bool;
+        default = false;
+        description = "Allow installing Microsoft font packages";
       };
     };
   };
 
-  config = mkMerge [
-    (mkIf cfg.enable {
+  config = mkIf cfg.enable (mkMerge [
+    {
       environment.systemPackages = with pkgs; [
         ripgrep
         fd
@@ -29,6 +41,16 @@ in
         file
         p7zip
       ];
+
+      nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) cfg.unfree.allow;
+    }
+
+    (mkIf cfg.useMicrosoftFonts {
+      braunse.utils.unfree.allow = ["corefonts" "vista-fonts"];
+      fonts.fonts = [
+        pkgs.corefonts
+        pkgs.vistafonts
+      ];
     })
-  ];
+  ]);
 }

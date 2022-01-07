@@ -15,6 +15,7 @@ nixpkgs.lib.nixosSystem {
         enable = true;
         enableElixir = true;
         enableFonts = true;
+        enableNode = true;
         enableRust = true;
         enableR = true;
         enableTypescript = true;
@@ -28,11 +29,16 @@ nixpkgs.lib.nixosSystem {
 
       braunse.xpra.enable = true;
 
+      braunse.utils = {
+        enable = true;
+        useMicrosoftFonts = true;
+      };
+
       users.users.seb = {
         isNormalUser = true;
         xpraDisplay = ":101";
         openssh.authorizedKeys.keys = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPdIT0XF1FMQTSBfm5kkyNT7qPxzMtAsbCTCFmyHBWaS" ];
-        extraGroups = [ "wheel" ];
+        extraGroups = [ "wheel" "docker" ];
       };
 
       boot.loader.systemd-boot.enable = true;
@@ -59,10 +65,17 @@ nixpkgs.lib.nixosSystem {
       networking.firewall.enable = true;
       networking.firewall.allowedTCPPorts = [ 22 ];
 
+      networking.extraHosts = ''
+      '';
+
       i18n.defaultLocale = "en_US.UTF-8";
       console.keyMap = "de-latin1";
 
       security.sudo.wheelNeedsPassword = false;
+
+      environment.systemPackages = with pkgs; [
+        docker-compose
+      ];
 
       services.openssh = {
         enable = true;
@@ -77,6 +90,12 @@ nixpkgs.lib.nixosSystem {
       services.postgresql = {
         enable = true;
         enableTCPIP = true;
+      };
+
+      virtualisation.docker = {
+        enable = true;
+        enableOnBoot = true;
+        autoPrune.enable = true;
       };
 
       nix.package = pkgs.nixFlakes;
@@ -103,6 +122,9 @@ nixpkgs.lib.nixosSystem {
           programs.bash = {
             enable = true;
             enableVteIntegration = true;
+            bashrcExtra = ''
+              [ -d "$HOME/.global_node_modules/bin" ] && PATH="$HOME/.global_node_modules/bin''${PATH:+:$PATH}"
+            '';
             historyControl = [ "erasedups" "ignoredups" "ignorespace" ];
           };
 
