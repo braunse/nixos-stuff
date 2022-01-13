@@ -75,6 +75,7 @@ nixpkgs.lib.nixosSystem {
 
       environment.systemPackages = with pkgs; [
         docker-compose
+        python3
       ];
 
       services.openssh = {
