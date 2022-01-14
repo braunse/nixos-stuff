@@ -14,6 +14,7 @@ nixpkgs.lib.nixosSystem {
       braunse.wsl = {
         enable = true;
         defaultUser = "seb";
+        wslConf.enable = true;
       };
 
       braunse.dev = {

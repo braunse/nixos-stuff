@@ -29,9 +29,27 @@ in
       type = str;
       default = "nixos";
     };
+
+    wslConf = {
+      enable = mkEnableOption "Manage wsl.conf";
+
+      config = mkOption {
+        type = attrsOf (attrsOf str);
+      };
+    };
   };
 
   config = mkIf cfg.enable {
+    braunse.wsl.wslConf.config.network.hostname = mkDefault config.networking.hostName;
+
+    environment.etc."wsl.conf" = mkIf cfg.wslConf.enable {
+      enable = true;
+      gid = 0;
+      uid = 0;
+      mode = "0644";
+      text = generators.toINI {} cfg.wslConf.config;
+    };
+
     environment.systemPackages = [
       pkgs.wsl-open
       pkgs.wslu
