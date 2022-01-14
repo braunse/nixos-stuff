@@ -75,7 +75,6 @@ in
         erlang-ls
         elixir_1_12
         elixir_ls
-        pkgs.crate2nix
       ];
     })
 
@@ -102,6 +101,7 @@ in
       environment.systemPackages = [
         self.packages.${system}.rust-toolchain
         self.packages.${system}.rust-analyzer
+        pkgs.crate2nix
       ];
     })
 
