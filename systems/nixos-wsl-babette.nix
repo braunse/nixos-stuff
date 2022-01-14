@@ -22,6 +22,7 @@ nixpkgs.lib.nixosSystem {
         enableElixir = true;
         enableFonts = true;
         enableHaskell = true;
+        enableNode = true;
         enablePurescript = true;
         enableRust = true;
         enableR = true;
@@ -35,11 +36,18 @@ nixpkgs.lib.nixosSystem {
         ];
       };
 
+      braunse.utils = {
+        enable = true;
+        useMicrosoftFonts = true;
+      };
+
       braunse.xpra.enable = true;
 
       users.users.seb = {
+        isNormalUser = true;
         xpraDisplay = ":101";
         openssh.authorizedKeys.keys = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPdIT0XF1FMQTSBfm5kkyNT7qPxzMtAsbCTCFmyHBWaS" ];
+        extraGroups = [ "wheel" "docker" ];
       };
 
       networking.hostName = "nixos-wsl-babette";
@@ -47,6 +55,7 @@ nixpkgs.lib.nixosSystem {
       services.openssh = {
         enable = true;
         listenAddresses = [{ addr = "127.0.0.1"; port = 17022; } { addr = "0.0.0.0"; port = 22; }];
+        forwardX11 = true;
       };
 
       nix.package = pkgs.nixFlakes;
@@ -66,6 +75,22 @@ nixpkgs.lib.nixosSystem {
         nixos.enable = true;
       };
 
+      services.x2goserver.enable = true;
+      services.xserver.desktopManager = {
+        xfce.enable = true;
+      };
+
+      services.postgresql = {
+        enable = true;
+        enableTCPIP = true;
+      };
+
+      virtualisation.docker = {
+        enable = true;
+        enableOnBoot = true;
+        autoPrune.enable = true;
+      };
+
       home-manager = {
         useGlobalPkgs = true;
         useUserPackages = true;
@@ -82,6 +107,10 @@ nixpkgs.lib.nixosSystem {
             enable = true;
           };
 
+          programs.firefox = {
+            enable = true;
+          };
+
           programs.git = {
             enable = true;
             userName = "Sebastien Braun";
@@ -94,6 +123,10 @@ nixpkgs.lib.nixosSystem {
             enable = true;
             agents = [ "ssh" ];
             keys = [ "id_ed25519_2" ];
+          };
+
+          programs.tmux = {
+            enable = true;
           };
         };
       };
