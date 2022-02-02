@@ -29,9 +29,19 @@ in
     enableR = mkEnableOption "R";
     enableScala = mkEnableOption "Scala";
     enableTypescript = mkEnableOption "Typescript";
+    enableLocalDevDns = mkEnableOption "Local Dev DNS";
+    enableLocalDevNginx = mkEnableOption "Local Dev Nginx";
     jdk = mkOption {
       type = package;
       default = pkgs.jdk17;
+    };
+    nginx.localTld = mkOption {
+      type = str;
+      default = "l0";
+    };
+    nginx.namedServices = mkOption {
+      type = attrsOf port;
+      default = { };
     };
     rPackages = mkOption {
       type = listOf package;
@@ -109,10 +119,59 @@ in
         ];
     })
 
+    (mkIf cfg.enableLocalDevDns {
+      services.unbound = {
+        enable = true;
+        settings = {
+          server = {
+            domain-insecure = [ "${cfg.nginx.localTld}." ];
+            local-zone = [ "${cfg.nginx.localTld}. nodefault" ];
+            do-not-query-localhost = "no";
+          };
+          stub-zone = [
+            {
+              name = "${cfg.nginx.localTld}.";
+              stub-addr = "127.0.0.1@1053";
+            }
+          ];
+        };
+      };
+
+      services.nsd = {
+        enable = true;
+        interfaces = [ "127.0.0.1@1053" "::1@1053" ];
+        zones = {
+          "${cfg.nginx.localTld}." = {
+            data = ''
+              $ORIGIN ${cfg.nginx.localTld}.
+              $TTL 300
+              @ IN SOA ns.${cfg.nginx.localTld}. admin.ns.${cfg.nginx.localTld}. 127001001 300 300 1200 300
+              @ IN NS 127.0.0.1
+              *.${cfg.nginx.localTld}. IN A 127.0.0.1
+            '';
+          };
+        };
+      };
+    })
+
+    (mkIf cfg.enableLocalDevNginx {
+      services.nginx = {
+        enable = true;
+        virtualHosts."__catchall" = {
+          serverName = "~^(?<dev_name>[A-za-z0-9-]+)-(?<dev_port>[0-9]+)[.]${cfg.nginx.localTld}$";
+          locations."/" = {
+            extraConfig = ''
+              proxy_pass http://127.0.0.1:$dev_port;
+              proxy_set_header Host $host;
+            '';
+          };
+        };
+      };
+    })
+
     (mkIf cfg.enableRust {
       environment.systemPackages = [
         self.packages.${system}.rust-toolchain
-        self.packages.${system}.rust-analyzer
         pkgs.crate2nix
 
         pkgs.cargo-about

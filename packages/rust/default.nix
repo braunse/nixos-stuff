@@ -8,10 +8,12 @@ let
 in
 if fenix.packages ? "${system}" then
   rec {
-    rust-toolchain = fenix.packages.${system}.stable.withComponents [
+    rust-toolchain = fenix.packages.${system}.latest.withComponents [
       "cargo"
       "clippy"
       "llvm-tools-preview"
+      "miri"
+      "rust-analyzer-preview"
       "rustc"
       "rust-docs"
       "rust-src"

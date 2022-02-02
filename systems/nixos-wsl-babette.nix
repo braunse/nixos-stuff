@@ -22,12 +22,16 @@ nixpkgs.lib.nixosSystem {
         enableElixir = true;
         enableFonts = true;
         enableHaskell = true;
+        enableLocalDevDns = true;
+        enableLocalDevNginx = true;
         enableNode = true;
         enablePurescript = true;
         enableRust = true;
         enableR = true;
         enableScala = true;
         enableTypescript = true;
+
+        nginx.localTld = "l1";
 
         rPackages = with pkgs.rPackages; [
           languageserver
@@ -75,6 +79,36 @@ nixpkgs.lib.nixosSystem {
         nixos.enable = true;
       };
 
+      services.nginx = {
+        enable = true;
+        virtualHosts = {
+          "kc-7f000002.nip.io" = {
+            locations."/" = {
+              proxyPass = "http://localhost:8090";
+              extraConfig = ''
+                proxy_set_header Host $host;
+                proxy_buffer_size 16k;
+                proxy_buffers 8 16k;
+              '';
+            };
+          };
+          "isgfui-7f000002.nip.io" = {
+            locations."/" = {
+              proxyPass = "http://localhost:3000";
+              extraConfig = ''
+                proxy_set_header Host $host;
+              '';
+            };
+          };
+          "isgfbe-7f000002.nip.io" = {
+            locations."/".proxyPass = "http://localhost:8055";
+          };
+          "isgfau-7f000002.nip.io" = {
+            locations."/".proxyPass = "http://localhost:3001";
+          };
+        };
+      };
+
       services.x2goserver.enable = true;
       services.xserver.desktopManager = {
         xfce.enable = true;
@@ -86,9 +120,15 @@ nixpkgs.lib.nixosSystem {
       };
 
       virtualisation.docker = {
-        enable = true;
+        enable = false;
         enableOnBoot = true;
         autoPrune.enable = true;
+      };
+
+      virtualisation.podman = {
+        enable = true;
+        dockerCompat = true;
+        dockerSocket.enable = true;
       };
 
       home-manager = {
