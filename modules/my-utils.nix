@@ -19,7 +19,7 @@ in
 
       unfree.allow = mkOption {
         type = listOf str;
-        default = [];
+        default = [ ];
         description = "What unfree packages to allow";
       };
 
@@ -40,13 +40,14 @@ in
         lsd
         file
         p7zip
+        ispell
       ];
 
       nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) cfg.unfree.allow;
     }
 
     (mkIf cfg.useMicrosoftFonts {
-      braunse.utils.unfree.allow = ["corefonts" "vista-fonts"];
+      braunse.utils.unfree.allow = [ "corefonts" "vista-fonts" ];
       fonts.fonts = [
         pkgs.corefonts
         pkgs.vistafonts

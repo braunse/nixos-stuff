@@ -47,7 +47,7 @@ in
       gid = 0;
       uid = 0;
       mode = "0644";
-      text = generators.toINI {} cfg.wslConf.config;
+      text = generators.toINI { } cfg.wslConf.config;
     };
 
     environment.systemPackages = [

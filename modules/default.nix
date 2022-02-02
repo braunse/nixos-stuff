@@ -11,5 +11,6 @@
     self.nixosModules.dev-envs
     self.nixosModules.xpra
     self.nixosModules.my-utils
+    self.nixosModules.my-defaults
   ];
 }

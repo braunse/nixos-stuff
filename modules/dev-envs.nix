@@ -21,6 +21,7 @@ in
     enableElixir = mkEnableOption "Elixir";
     enableFonts = mkEnableOption "Nerd Fonts";
     enableHaskell = mkEnableOption "Haskell";
+    enableJava = mkEnableOption "Java";
     enableJupyter = mkEnableOption "Jupyter";
     enableNode = mkEnableOption "Node.js";
     enablePurescript = mkEnableOption "Purescript";
@@ -28,6 +29,10 @@ in
     enableR = mkEnableOption "R";
     enableScala = mkEnableOption "Scala";
     enableTypescript = mkEnableOption "Typescript";
+    jdk = mkOption {
+      type = package;
+      default = pkgs.jdk17;
+    };
     rPackages = mkOption {
       type = listOf package;
       default = [ ];
@@ -75,6 +80,13 @@ in
         erlang-ls
         elixir_1_12
         elixir_ls
+      ];
+    })
+
+    (mkIf cfg.enableJava {
+      environment.systemPackages = with pkgs; [
+        cfg.jdk
+        (maven3.override { jdk = cfg.jdk; })
       ];
     })
 

@@ -11,14 +11,21 @@ nixpkgs.lib.nixosSystem {
     home-manager.nixosModules.home-manager
 
     ({ config, lib, pkgs, ... }: {
+      imports = [ ./tiki.nix ];
+
+      braunse.defaults.enable = true;
+
       braunse.dev = {
         enable = true;
         enableElixir = true;
         enableFonts = true;
+        enableJava = true;
         enableNode = true;
         enableRust = true;
         enableR = true;
         enableTypescript = true;
+
+        jdk = pkgs.adoptopenjdk-hotspot-bin-15;
 
         rPackages = with pkgs.rPackages; [
           languageserver
@@ -68,6 +75,21 @@ nixpkgs.lib.nixosSystem {
       networking.extraHosts = ''
       '';
 
+      networking.wireguard = {
+        enable = true;
+        interfaces = {
+          wg-dib = {
+            ips = [ "172.17.0.4/32" ];
+            peers = [{
+              allowedIPs = [ "172.16.0.0/16" "172.17.0.1/32" "172.18.0.0/16" ];
+              endpoint = "dib-s0.alt0r.com:27031";
+              publicKey = "QrpAJQpfxJuLHfvMwoDBECuEBQ+Ke0U4PMUKLzq5pAk=";
+            }];
+            privateKeyFile = "/var/lib/localsecrets/wg-dib.priv";
+          };
+        };
+      };
+
       i18n.defaultLocale = "en_US.UTF-8";
       console.keyMap = "de-latin1";
 
@@ -101,19 +123,35 @@ nixpkgs.lib.nixosSystem {
 
       nix.package = pkgs.nixFlakes;
       nix.extraOptions = ''
+        builders-use-substitutes = true
         experimental-features = nix-command flakes
         keep-derivations = true
       '';
       nix.nixPath = [
         "nixpkgs=${nixpkgs}"
       ];
-
       nix.registry.nixpkgs.flake = nixpkgs;
+      nix.buildMachines = [
+        {
+          hostName = "builder1";
+          system = "x86_64-linux";
+          maxJobs = 4;
+          speedFactor = 1;
+          supportedFeatures = [ "nixos-test" "benchmark" "big-parallel" "kvm" ];
+          mandatoryFeatures = [ ];
+        }
+      ];
+      nix.distributedBuilds = true;
 
       documentation = {
         enable = true;
         man.enable = true;
         nixos.enable = true;
+      };
+
+      services.rabbitmq = {
+        enable = true;
+        managementPlugin.enable = true;
       };
 
       home-manager = {
@@ -129,7 +167,12 @@ nixpkgs.lib.nixosSystem {
             historyControl = [ "erasedups" "ignoredups" "ignorespace" ];
           };
 
-          programs.bat.enable = true;
+          programs.bat = {
+            enable = true;
+            config = {
+              theme = "Nord";
+            };
+          };
 
           programs.direnv = {
             enable = true;
