@@ -16,6 +16,7 @@ if fenix.packages ? "${system}" then
       "rust-docs"
       "rust-src"
       "rust-std"
+      "rustfmt"
     ];
     rust-analyzer = fenix.packages.${system}.rust-analyzer;
     rust-analyzer-git = pkgs.callPackage ./rust-analyzer-git.nix { inherit importCargo rust-analyzer-src rust-toolchain; };
