@@ -114,6 +114,14 @@ in
         self.packages.${system}.rust-toolchain
         self.packages.${system}.rust-analyzer
         pkgs.crate2nix
+
+        pkgs.cargo-about
+        pkgs.cargo-crev
+        pkgs.cargo-deny
+        pkgs.cargo-edit
+        pkgs.cargo-feature
+        pkgs.cargo-udeps
+        pkgs.cargo-whatfeatures
       ];
     })
 
