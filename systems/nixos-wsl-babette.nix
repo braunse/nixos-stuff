@@ -70,8 +70,18 @@ nixpkgs.lib.nixosSystem {
       nix.nixPath = [
         "nixpkgs=${nixpkgs}"
       ];
-
       nix.registry.nixpkgs.flake = nixpkgs;
+      nix.buildMachines = [
+        {
+          hostName = "builder1";
+          maxJobs = 4;
+          speedFactor = 1;
+          sshKey = "/root/.ssh/nixos-dev1-builder";
+          sshUser = "nix-ssh";
+          supportedFeatures = ["kvm" "big-parallel"];
+          systems = [ "x86_64-linux" ];
+        }
+      ];
 
       documentation = {
         enable = true;
@@ -163,6 +173,7 @@ nixpkgs.lib.nixosSystem {
             enable = true;
             agents = [ "ssh" ];
             keys = [ "id_ed25519_2" ];
+            extraFlags = ["--systemd"];
           };
 
           programs.tmux = {
