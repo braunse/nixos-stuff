@@ -41,6 +41,10 @@ in
         file
         p7zip
         ispell
+        zip
+        unzip
+        jq
+        fx
       ];
 
       nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) cfg.unfree.allow;

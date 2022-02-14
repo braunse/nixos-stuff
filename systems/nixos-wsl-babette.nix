@@ -22,6 +22,7 @@ nixpkgs.lib.nixosSystem {
         enableElixir = true;
         enableFonts = true;
         enableHaskell = true;
+        enableJava = true;
         enableLocalDevDns = true;
         enableLocalDevNginx = true;
         enableNode = true;
@@ -38,11 +39,14 @@ nixpkgs.lib.nixosSystem {
           shiny
           tidyverse
         ];
+
+        vscode.enableGeneralTools = true;
       };
 
       braunse.utils = {
         enable = true;
         useMicrosoftFonts = true;
+        unfree.allow = ["idea-ultimate"]; 
       };
 
       braunse.xpra.enable = true;
@@ -51,7 +55,10 @@ nixpkgs.lib.nixosSystem {
         isNormalUser = true;
         xpraDisplay = ":101";
         openssh.authorizedKeys.keys = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPdIT0XF1FMQTSBfm5kkyNT7qPxzMtAsbCTCFmyHBWaS" ];
-        extraGroups = [ "wheel" "docker" ];
+        extraGroups = [ "wheel" "docker" "podman" ];
+        packages = [
+          pkgs.kube3d
+        ];
       };
 
       networking.hostName = "nixos-wsl-babette";
@@ -144,11 +151,16 @@ nixpkgs.lib.nixosSystem {
       home-manager = {
         useGlobalPkgs = true;
         useUserPackages = true;
-        users.seb = { config, lib, pkgs, ... }: {
+        users.seb = let sconfig = config; in { config, lib, pkgs, ... }: {
+          home.file.".tools/java".source = sconfig.braunse.dev.jdk;
+
           programs.bash = {
             enable = true;
             enableVteIntegration = true;
             historyControl = [ "erasedups" "ignoredups" "ignorespace" ];
+            bashrcExtra = ''
+              [[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
+            '';
           };
 
           programs.bat.enable = true;
@@ -178,6 +190,12 @@ nixpkgs.lib.nixosSystem {
 
           programs.tmux = {
             enable = true;
+          };
+
+          programs.vscode = {
+            enable = true;
+            package = pkgs.vscodium-fhs;
+            extensions = sconfig.braunse.dev.vscode.extensions;
           };
         };
       };

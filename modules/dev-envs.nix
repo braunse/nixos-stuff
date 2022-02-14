@@ -31,10 +31,12 @@ in
     enableTypescript = mkEnableOption "Typescript";
     enableLocalDevDns = mkEnableOption "Local Dev DNS";
     enableLocalDevNginx = mkEnableOption "Local Dev Nginx";
+
     jdk = mkOption {
       type = package;
       default = pkgs.jdk17;
     };
+
     nginx.localTld = mkOption {
       type = str;
       default = "l0";
@@ -43,14 +45,17 @@ in
       type = attrsOf port;
       default = { };
     };
+
     rPackages = mkOption {
       type = listOf package;
       default = [ ];
     };
+
     ghcVersions = mkOption {
       type = listOf str;
       default = [ "8107" ];
     };
+
     nerdFonts = mkOption {
       type = listOf str;
       default = [
@@ -64,11 +69,18 @@ in
         "Terminus"
       ];
     };
+
     emacsPackages = mkOption {
       type = listOf str;
       default = [
         "vterm"
       ];
+    };
+
+    vscode.enableGeneralTools = mkEnableOption "VSCode General Tools";
+    vscode.extensions = mkOption {
+      type = listOf package;
+      default = [];
     };
   };
 
@@ -91,12 +103,23 @@ in
         elixir_1_12
         elixir_ls
       ];
+
+      braunse.dev.vscode.extensions = with pkgs.vscode-extensions; [
+        elixir-lsp.vscode-elixir-ls
+      ];
+      # vscode.extensions = [
+      #   "ms-python.python"
+      # ];
     })
 
     (mkIf cfg.enableJava {
       environment.systemPackages = with pkgs; [
         cfg.jdk
         (maven3.override { jdk = cfg.jdk; })
+        pkgs.jbang
+      ];
+      braunse.dev.vscode.extensions = with pkgs.vscode-extensions; [
+        redhat.java
       ];
     })
 
@@ -106,6 +129,15 @@ in
         yarn
         pnpm
         node2nix
+      ];
+      braunse.dev.vscode.extensions = with pkgs.vscode-extensions; [
+        apollographql.vscode-apollo
+        bradlc.vscode-tailwindcss
+        dbaeumer.vscode-eslint
+        denoland.vscode-deno
+        esbenp.prettier-vscode
+        jpoissonnier.vscode-styled-components
+        wix.vscode-import-cost
       ];
     })
 
@@ -117,6 +149,9 @@ in
           pkgs.cabal-install
           pkgs.cabal2nix
         ];
+      braunse.dev.vscode.extensions = with pkgs.vscode-extensions; [
+        haskell.haskell
+      ];
     })
 
     (mkIf cfg.enableLocalDevDns {
@@ -182,6 +217,12 @@ in
         pkgs.cargo-udeps
         pkgs.cargo-whatfeatures
       ];
+      braunse.dev.vscode.extensions = with pkgs.vscode-extensions; [
+        bungcip.better-toml
+        # llvm-org.lldb-vscode
+        matklad.rust-analyzer
+        serayuzgur.crates
+      ];
     })
 
     (mkIf cfg.enableR {
@@ -211,6 +252,10 @@ in
         pkgs.mill
         pkgs.sbt
       ];
+      braunse.dev.vscode.extensions = with pkgs.vscode-extensions; [
+        baccata.scaladex-search
+        scalameta.metals
+      ];
     })
 
     (mkIf cfg.enableTypescript {
@@ -226,6 +271,24 @@ in
         (pkgs.nerdfonts.override {
           fonts = cfg.nerdFonts;
         })
+      ];
+    })
+
+    (mkIf cfg.vscode.enableGeneralTools {
+      braunse.dev.vscode.extensions = with pkgs.vscode-extensions; [
+        alexdima.copy-relative-path
+        arrterian.nix-env-selector
+        asciidoctor.asciidoctor-vscode
+        b4dm4n.vscode-nixpkgs-fmt
+        bbenoist.nix
+        eamodio.gitlens
+        editorconfig.editorconfig
+        graphql.vscode-graphql
+        gruntfuggly.todo-tree
+        ms-azuretools.vscode-docker
+        kahole.magit
+        ms-kubernetes-tools.vscode-kubernetes-tools
+        redhat.vscode-yaml
       ];
     })
   ]);
