@@ -13,14 +13,14 @@ if fenix.packages ? "${system}" then
       "clippy"
       "llvm-tools-preview"
       "miri"
-      "rust-analyzer-preview"
       "rustc"
+      "rust-analyzer-preview"
       "rust-docs"
       "rust-src"
       "rust-std"
       "rustfmt"
     ];
-    rust-analyzer = fenix.packages.${system}.rust-analyzer;
+    rust-analyzer = rust-toolchain;
     rust-analyzer-git = pkgs.callPackage ./rust-analyzer-git.nix { inherit importCargo rust-analyzer-src rust-toolchain; };
   }
 else
