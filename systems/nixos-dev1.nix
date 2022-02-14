@@ -32,6 +32,8 @@ nixpkgs.lib.nixosSystem {
           shiny
           tidyverse
         ];
+
+        vscode.enableGeneralTools = true;
       };
 
       braunse.xpra.enable = true;
@@ -46,6 +48,10 @@ nixpkgs.lib.nixosSystem {
         xpraDisplay = ":101";
         openssh.authorizedKeys.keys = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPdIT0XF1FMQTSBfm5kkyNT7qPxzMtAsbCTCFmyHBWaS" ];
         extraGroups = [ "wheel" "docker" ];
+        packages = with pkgs; [
+          bitwarden
+          krew
+        ];
       };
 
       boot.loader.systemd-boot.enable = true;
@@ -163,6 +169,7 @@ nixpkgs.lib.nixosSystem {
             enableVteIntegration = true;
             bashrcExtra = ''
               [ -d "$HOME/.global_node_modules/bin" ] && PATH="$HOME/.global_node_modules/bin''${PATH:+:$PATH}"
+              [ -d "''${KREW_ROOT:-$HOME/.krew}/bin" ] && PATH="''${KREW_ROOT:-$HOME/.krew}/bin''${PATH:+:$PATH}"
             '';
             historyControl = [ "erasedups" "ignoredups" "ignorespace" ];
           };
@@ -180,6 +187,11 @@ nixpkgs.lib.nixosSystem {
 
           programs.firefox = {
             enable = true;
+          };
+
+          programs.fzf = {
+            enable = true;
+            tmux.enableShellIntegration = true;
           };
 
           programs.git = {
