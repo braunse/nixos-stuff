@@ -157,7 +157,7 @@ nixpkgs.lib.nixosSystem {
       home-manager = {
         useGlobalPkgs = true;
         useUserPackages = true;
-        users.seb = { config, lib, pkgs, ... }: {
+        users.seb = let sconfig = config; in { config, lib, pkgs, ... }: {
           programs.bash = {
             enable = true;
             enableVteIntegration = true;
@@ -200,6 +200,12 @@ nixpkgs.lib.nixosSystem {
 
           programs.tmux = {
             enable = true;
+          };
+
+          programs.vscode = {
+            enable = true;
+            package = pkgs.vscodium-fhs;
+            extensions = sconfig.braunse.dev.vscode.extensions;
           };
         };
       };
